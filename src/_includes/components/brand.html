@@ -1,0 +1,7 @@
+{# Linked logo: the supplied complete logo (mark + wordmark), recoloured per background
+   by src/_data/assets.js. The image alt is the link's only accessible name.
+   Set `logoVariant` ("onLight" | "onDark") and `logoClass` (height) before including. #}
+{% set logo = assets.logo[logoVariant] %}
+<a class="inline-flex shrink-0 items-center" href="/">
+  <img class="w-auto {{ logoClass }}" src="{{ logo.href }}" width="{{ logo.width }}" height="{{ logo.height }}" alt="{{ site.name }} — Home">
+</a>

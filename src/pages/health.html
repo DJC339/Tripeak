@@ -1,0 +1,17 @@
+---
+# Uptime-monitoring endpoint: confirms the deployed static site is reachable.
+# Deliberately standalone (no layout, CSS, JS, fonts or images) and reveals nothing
+# about versions or environment. Headers (no-store, X-Robots-Tag) are in netlify.toml.
+permalink: /health/
+layout: false
+eleventyExcludeFromCollections: true
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Tripeak OK</title>
+</head>
+<body>Tripeak OK</body>
+</html>

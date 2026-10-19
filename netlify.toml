@@ -1,0 +1,72 @@
+# Netlify build configuration. Not deployed yet — see README "Deployment".
+#
+# Indexing: Netlify sets CONTEXT for every build. Only `production` builds are
+# indexable (robots.txt, robots meta). Every other context (deploy previews,
+# branch deploys) also gets `X-Robots-Tag: noindex` via a generated _headers file.
+# Set SITE_URL in the Netlify UI (Production context) once the domain is final;
+# canonical URLs and sitemap.xml are only generated when it is present.
+
+[build]
+  command = "npm run build"
+  publish = "_site"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# --- Security headers (all responses) --------------------------------------
+# CSP allows only same-origin assets: no inline scripts/styles, no eval,
+# no third-party requests. Update it deliberately if a booking widget,
+# analytics or embeds are added later.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Strict-Transport-Security = "max-age=31536000"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-origin"
+
+# --- Caching ----------------------------------------------------------------
+# HTML and other stable URLs keep Netlify's default (max-age=0, must-revalidate),
+# so new deploys show up immediately. Cache-Control is deliberately not set on
+# "/*" to avoid overlapping rules.
+
+# Content-hashed CSS, JS and images (filenames change when content changes).
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Fonts have stable filenames: cache for 30 days, not immutable.
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/favicon*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/apple-touch-icon.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# --- Monitoring endpoint ----------------------------------------------------
+# /health/ must never be cached or indexed. No other rule sets Cache-Control or
+# X-Robots-Tag on this path (tests check the combined result).
+[[headers]]
+  for = "/health/"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex"
+
+[[headers]]
+  for = "/health/index.html"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex"

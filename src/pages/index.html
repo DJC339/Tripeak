@@ -1,0 +1,59 @@
+---
+layout: layouts/base.html
+permalink: /
+organizationSchema: true
+# Homepage copy is from Keith's "Home Page Mock Up.pdf". Edit text directly below.
+capabilities:
+  - title: Workflow Automation
+    text: Unify your apps, tasks, and reporting into fast, seamless workflows.
+  - title: Custom Power Apps
+    text: Tailored applications designed around your team's specific requirements.
+  - title: AI-Assisted Operations
+    text: Guardrailed AI that removes busywork and supports human decisions.
+---
+{% from "components/ui.html" import buttonLink, capabilityCard %}
+
+<section class="hero on-dark relative isolate overflow-hidden bg-navy text-offwhite" aria-labelledby="hero-title">
+  {# Decorative background photo (empty alt). Not lazy-loaded: it is the above-the-fold image. #}
+  {% image "hero-mountains.jpg", "", {
+    sizes: "(min-width: 1024px) 100vw, 1300px",
+    widths: [960, 1440, 1920, 2880],
+    eager: true,
+    class: "absolute inset-0 -z-20 size-full object-cover object-[45%_25%]"
+  } %}
+  <div class="hero-overlay absolute inset-0 -z-10" aria-hidden="true"></div>
+
+  <div class="hero-content container-site pb-20 text-center md:pb-28">
+    <p class="text-hero font-medium tracking-wide text-sand">Veteran Owned &amp; Operated</p>
+    <h1 id="hero-title" class="mx-auto mt-3 max-w-[22ch] font-serif text-display font-bold tracking-[0.01em] sm:max-w-none">
+      Transform Your Microsoft Ecosystem into a High&#8209;Performance Engine
+    </h1>
+    <p class="mx-auto mt-6 max-w-[68rem] text-hero">
+      Most organizations only tap into a fraction of their digital potential. Tripeak Digital bridges that gap,
+      building secure, bespoke <strong class="font-bold">Power Platform</strong> solutions designed for precision and scale.
+    </p>
+    {{ buttonLink(site.discoveryHref, "Schedule a Technical Discovery", "mt-10 px-5 py-3.5 tracking-wide") }}
+  </div>
+</section>
+
+<section id="services" class="py-16 md:py-28" aria-labelledby="services-title">
+  <div class="container-site">
+    <div class="text-center">
+      <h2 id="services-title" class="font-serif text-heading font-semibold">Our Core Capabilities</h2>
+      <p class="mx-auto mt-6 max-w-[32rem] text-lead font-medium">
+        Secure, practical systems that replace fragmented processes and disconnected tools.
+      </p>
+    </div>
+
+    <ul class="mx-auto mt-12 grid max-w-2xl gap-6 md:mt-16 lg:max-w-none lg:grid-cols-3" role="list">
+      {% for item in capabilities %}
+        {{ capabilityCard(item.title, item.text) }}
+      {% endfor %}
+    </ul>
+
+    <div class="mt-12 text-center md:mt-16">
+      {# Temporary: there is no Services page yet, so this opens an email enquiry. #}
+      {{ buttonLink(site.servicesHref, "Ask About Our Services", "min-w-[16.75rem] tracking-wide") }}
+    </div>
+  </div>
+</section>

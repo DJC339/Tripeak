@@ -1,0 +1,23 @@
+---
+layout: layouts/base.html
+permalink: /404.html
+title: Page not found
+description: The page you were looking for could not be found.
+noindex: true
+eleventyExcludeFromCollections: true
+---
+{% from "components/ui.html" import buttonLink %}
+<section class="py-20 md:py-28" aria-labelledby="page-title">
+  <div class="container-site max-w-3xl text-center">
+    <p class="font-medium tracking-wide text-teal">Error 404</p>
+    <h1 id="page-title" class="mt-3 font-serif text-heading font-bold">We couldn’t find that page</h1>
+    <p class="mx-auto mt-6 max-w-xl">
+      The link may be out of date, or the address may have a typo. Try one of these instead:
+    </p>
+    <ul class="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row" role="list">
+      <li>{{ buttonLink("/", "Go to the homepage") }}</li>
+      <li><a class="inline-flex min-h-11 items-center font-medium text-teal underline underline-offset-4 hover:text-navy" href="/about/">About us</a></li>
+      <li><a class="inline-flex min-h-11 items-center font-medium text-teal underline underline-offset-4 hover:text-navy" href="{{ site.contactHref }}">Email {{ site.email }}</a></li>
+    </ul>
+  </div>
+</section>

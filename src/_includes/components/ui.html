@@ -1,0 +1,12 @@
+{# Link styled as a button. Use only for navigation (links), never for actions. #}
+{% macro buttonLink(href, label, class="") %}
+<a class="btn {{ class }}" href="{{ href }}">{{ label }}</a>
+{% endmacro %}
+
+{# Capability card with the chevron accent bar. #}
+{% macro capabilityCard(title, text) %}
+<li class="card">
+  <h3 class="font-serif text-card-title font-bold">{{ title }}</h3>
+  <p class="mt-3">{{ text }}</p>
+</li>
+{% endmacro %}
