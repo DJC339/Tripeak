@@ -3,31 +3,139 @@ layout: layouts/base.html
 permalink: /about/
 title: About
 description: Learn about Tripeak Digital, a veteran owned and operated Power Platform company in Edmonton, Alberta.
-# Remove `placeholder: true` once approved About copy replaces the placeholder
-# below. While set, the page is marked noindex and left out of the sitemap.
-placeholder: true
+# Copy and layout are from Keith's "About Page Mock Up.pdf" (tenet text from
+# "About Page Mock Up - Expanded Cards.pdf"). Edit text directly below.
 ---
-<section class="py-16 md:py-24" aria-labelledby="page-title">
-  <div class="container-site max-w-3xl">
-    <h1 id="page-title" class="font-serif text-heading font-bold">About Tripeak Digital</h1>
+{% from "components/ui.html" import buttonLink %}
 
-    <div class="placeholder-note mt-10">
-      <p class="font-bold">Placeholder content — replace before launch</p>
-      <p class="mt-3">
-        This page uses the shared site layout and is ready for approved About copy.
-        Suggested sections, to be confirmed with Tripeak Digital:
+{% set steps = [
+  ["Discovery", "Map the workflow, users, risks, and constraints."],
+  ["Objective & Scope", "Define success criteria, deliverables, and timelines."],
+  ["Build & Validate", "Develop, test, and refine for mission-readiness."],
+  ["Deploy & Sustain", "Support launch, user adoption, and continuous optimization."]
+] %}
+
+{# Fourth title confirmed as "Mission-Centric Design" (the page mock-up said "Operational Adoption"). #}
+{% set tenets = [
+  ["Unshakeable Foundation", "We build resilient, scalable architectures. Our solutions are designed to integrate seamlessly into your existing Microsoft ecosystem, ensuring long-term maintainability and enterprise-grade stability."],
+  ["Surgical Precision", "We eliminate ambiguity. Through disciplined scope management and rigorous testing, we ensure every workflow and application is engineered to meet your exact operational requirements."],
+  ["Tactical Velocity", "Speed is a requirement, not a luxury. We leverage the Power Platform to deploy high-impact solutions rapidly, allowing your organization to adapt and move faster without compromising security."],
+  ["Mission-Centric Design", "Technology is only effective if it is used. We design intuitive, user-centric interfaces that empower your workforce, ensuring high adoption rates and immediate operational impact."],
+  ["Absolute Dependability", "We operate with unwavering consistency. From initial discovery to final deployment, we provide transparent communication and reliable delivery, ensuring our solutions align with your mission and your timeline."]
+] %}
+
+<section class="on-dark bg-navy text-offwhite" aria-labelledby="about-title">
+  <div class="container-site grid items-center gap-10 py-14 md:grid-cols-[1.4fr_1fr] md:py-20 lg:gap-16">
+    <div>
+      <p class="text-sm font-medium tracking-[0.15em] text-sand uppercase">About</p>
+      <h1 id="about-title" class="mt-4 font-serif text-display font-bold">
+        Veteran-owned.<br>Mission-focused.<br>Expert-led.
+      </h1>
+      <p class="mt-6 max-w-xl text-lead">
+        We deliver high-performance, secure digital transformations built on the
+        <strong class="font-bold">Microsoft Power Platform</strong>. No agency bureaucracy. Just precision
+        workflows and bespoke applications designed for mission-critical operations.
       </p>
-      <ul class="mt-3 list-disc space-y-1 pl-6">
-        <li>[Company story and mission]</li>
-        <li>[Founder background, including veteran service, as approved]</li>
-        <li>[How Tripeak Digital works with clients]</li>
-        <li>[Optional profile photo with descriptive alt text]</li>
-      </ul>
+      {{ buttonLink(site.discoveryHref, "Schedule a Technical Discovery", "mt-8 tracking-wide") }}
     </div>
+    <div class="mx-auto w-full max-w-sm md:ml-auto md:mr-0">
+      {% image "Profile Image.webp", "Keith Omand, founder of Tripeak Digital", {
+        sizes: "(min-width: 768px) 24rem, 100vw",
+        widths: [480, 768, 1080],
+        eager: true,
+        class: "aspect-[4/5] w-full rounded-xl border-4 border-white object-cover shadow-card"
+      } %}
+    </div>
+  </div>
+</section>
 
-    <p class="mt-10">
-      To talk about a project in the meantime, email
-      <a class="font-medium text-teal underline underline-offset-4 hover:text-navy" href="{{ site.contactHref }}">{{ site.email }}</a>.
-    </p>
+<section class="pt-16 md:pt-24" aria-labelledby="mission-title">
+  <div class="container-site">
+    <div class="bg-white p-6 shadow-card md:p-10">
+      <h2 id="mission-title" class="font-serif text-heading font-semibold">Our Mission</h2>
+      <p class="mt-5 font-bold">
+        Inspired by the enduring strength of the Three Sisters mountain range in Canmore, Alberta, Tripeak Digital
+        is a veteran-owned consultancy dedicated to precision digital transformation.
+      </p>
+      <p class="mt-4">
+        We specialize in building secure, reliable Microsoft Power Platform solutions for organizations that demand
+        high-performance results without the weight of traditional agency bureaucracy.
+      </p>
+      <p class="mt-4">
+        We operate on a principle of High-Velocity Execution by eliminating the friction of traditional project
+        management cycles. Instead, we utilize proactive communication that provides you with direct, real-time
+        visibility into our progress. This ensures the momentum is never lost to silence by providing the data and
+        the results, exactly when you need them.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="pt-16 md:pt-24" aria-labelledby="process-title">
+  <div class="container-site">
+    <div class="text-center">
+      <h2 id="process-title" class="font-serif text-heading font-semibold">A clear process. No surprises.</h2>
+      <p class="mx-auto mt-5 max-w-xl text-lead">
+        We work the way operational leaders plan: Map, Define, Build, and Sustain.
+      </p>
+    </div>
+    <ol class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" role="list">
+      {% for title, text in steps %}
+        <li class="card">
+          <span class="absolute top-3 right-3 grid size-7 place-items-center bg-navy text-sm font-bold text-offwhite" aria-hidden="true">{{ loop.index }}</span>
+          <h3 class="pr-6 font-serif text-card-title font-bold"><span class="sr-only">Step {{ loop.index }}: </span>{{ title }}</h3>
+          <p class="mt-3">{{ text }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="pt-16 md:pt-24" aria-labelledby="tenets-title">
+  <div class="container-site">
+    <h2 id="tenets-title" class="text-center font-serif text-heading font-semibold">Our Core Tenets of Execution</h2>
+    {# Native <details>: no JavaScript, keyboard accessible. Closed cards clamp to two lines. #}
+    <ul class="mt-12 flex flex-wrap justify-center gap-6" role="list">
+      {% for title, text in tenets %}
+        <li class="w-full md:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]">
+          <details class="card group h-full pb-10">
+            <summary class="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+              <h3 class="font-serif text-card-title font-bold">{{ title }}</h3>
+              <p class="mt-3 line-clamp-2 group-open:line-clamp-none">{{ text }}</p>
+              <span class="absolute right-3 bottom-3 text-navy" aria-hidden="true">
+                <svg class="size-4 group-open:hidden" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2h4v4M14 2l-4.5 4.5M6 14H2v-4M2 14l4.5-4.5M2 6V2h4M2 2l4.5 4.5M14 10v4h-4M14 14l-4.5-4.5"/></svg>
+                <svg class="hidden size-4 group-open:block" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9.5 2.5v4h4M9.5 6.5 14 2M6.5 13.5v-4h-4M6.5 9.5 2 14M2.5 6.5h4v-4M6.5 6.5 2 2M13.5 9.5h-4v4M9.5 9.5 14 14"/></svg>
+              </span>
+            </summary>
+          </details>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="pt-16 md:pt-24" aria-labelledby="security-title">
+  <div class="container-site">
+    <div class="rounded-md bg-[repeating-linear-gradient(-45deg,var(--color-navy)_0_26px,var(--color-offwhite)_26px_52px)] px-4 py-4 sm:px-[12%] lg:px-[16%]">
+      <div class="rounded-md border-2 border-navy bg-offwhite px-6 py-8 text-center md:px-10">
+        <h2 id="security-title" class="font-serif text-heading font-semibold">Security-First Mindset</h2>
+        <p class="mx-auto mt-4 max-w-2xl text-lead">
+          We understand the stakes of your data. Our solutions are architected within your existing security
+          perimeter, adhering to the highest standards of data integrity and compliance required by government and
+          enterprise organizations.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 text-center md:py-24" aria-labelledby="execute-title">
+  <div class="container-site">
+    <h2 id="execute-title" class="font-serif text-heading font-semibold">Ready To Execute?</h2>
+    <p class="mt-4 text-lead">Let's discuss how we can streamline your operations.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      {{ buttonLink(site.discoveryHref, "Schedule a Technical Discovery", "tracking-wide") }}
+      {{ buttonLink("/services/", "Explore our Offerings", "border-2 border-navy bg-transparent text-navy tracking-wide hover:bg-navy hover:text-offwhite") }}
+    </div>
   </div>
 </section>

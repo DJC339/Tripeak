@@ -1,0 +1,43 @@
+{# Homepage contact section (#contact). No JavaScript required.
+   The form posts to the contact function (/api/contact, netlify/functions/contact.mjs),
+   which re-validates every field server-side, drops honeypot ("bot-field") hits,
+   and forwards clean submissions to Netlify Forms. It then redirects to /thanks/
+   or /form-error/. Keep minlength/maxlength in sync with LIMITS in the function.
+   No data-netlify here: the public form must not be registered with Netlify. #}
+<section id="contact" class="bg-white py-16 md:py-24" aria-labelledby="contact-title">
+  <div class="container-site grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+    <div>
+      <h2 id="contact-title" class="font-serif text-heading font-semibold">Contact</h2>
+      <p class="mt-5 text-lead">Tell us about your project or request a technical discovery.</p>
+      <p class="mt-5">
+        Prefer email? Write to
+        <a class="font-medium text-teal underline underline-offset-4 hover:text-navy" href="{{ site.emailHref }}">{{ site.email }}</a>.
+      </p>
+    </div>
+
+    <form class="contact-form" method="POST" action="/api/contact" aria-describedby="contact-required">
+      <p hidden>
+        <label>Leave this field empty <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+      </p>
+
+      <p id="contact-required" class="text-sm">All fields are required.</p>
+
+      <div class="mt-5">
+        <label class="form-label" for="contact-name">Name</label>
+        <input class="form-field" id="contact-name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100">
+      </div>
+
+      <div class="mt-5">
+        <label class="form-label" for="contact-email">Email</label>
+        <input class="form-field" id="contact-email" name="email" type="email" autocomplete="email" required minlength="3" maxlength="254" spellcheck="false">
+      </div>
+
+      <div class="mt-5">
+        <label class="form-label" for="contact-message">Message</label>
+        <textarea class="form-field" id="contact-message" name="message" rows="6" required minlength="5" maxlength="5000"></textarea>
+      </div>
+
+      <button class="btn mt-6 w-full cursor-pointer sm:w-auto" type="submit">Send Message</button>
+    </form>
+  </div>
+</section>

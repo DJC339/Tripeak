@@ -1,0 +1,45 @@
+---
+layout: layouts/page.html
+permalink: /portfolio/
+title: Portfolio
+description: Selected Microsoft Power Platform work by Tripeak Digital.
+# Add approved entries to src/_data/projects.js, then remove `placeholder: true`.
+# While set, the page is noindex and not in the sitemap.
+placeholder: true
+---
+{% from "components/ui.html" import buttonLink, projectCard, placeholderNote, placeholderProject %}
+
+<section class="py-14 md:py-20" aria-labelledby="projects-title">
+  <div class="container-site">
+    <h2 id="projects-title" class="font-serif text-heading font-semibold">Projects</h2>
+
+    {% if projects.length %}
+      <ul class="mt-10 grid gap-6 md:grid-cols-2" role="list">
+        {% for project in projects %}
+          <li>{{ projectCard(project, detailed=true) }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="mt-8 max-w-3xl">
+        {{ placeholderNote("Approved project examples or anonymized case summaries will appear here, one card per project. Each entry needs:", [
+          "[Title and sector or anonymized client type]",
+          "[Short summary, challenge, solution and approved outcome]",
+          "[Technologies used]",
+          "[Written approval from the client, or an anonymized description]"
+        ]) }}
+      </div>
+      <ul class="mt-10 grid gap-6 md:grid-cols-2" role="list">
+        <li>{{ projectCard(placeholderProject, detailed=true, placeholder=true) }}</li>
+      </ul>
+    {% endif %}
+  </div>
+</section>
+
+<section class="pb-16 md:pb-24" aria-labelledby="portfolio-contact-title">
+  <div class="container-site *:max-w-3xl">
+    <h2 id="portfolio-contact-title" class="font-serif text-heading font-semibold">Have a Project in Mind?</h2>
+    <div class="mt-8">
+      {{ buttonLink(site.contactHref, "Contact Tripeak Digital", "tracking-wide") }}
+    </div>
+  </div>
+</section>

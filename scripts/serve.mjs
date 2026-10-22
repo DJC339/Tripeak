@@ -1,13 +1,23 @@
 // Minimal static server for testing the production build in _site.
 // Mimics Netlify closely enough for tests: pretty URLs (with a trailing-slash
-// redirect), /404.html for missing pages, and every matching header rule from
-// netlify.toml plus the generated _site/_headers file.
+// redirect), /404.html for missing pages, forced 404 redirects, every matching
+// header rule from netlify.toml plus the generated _site/_headers file, and the
+// contact function at /api/contact.
+//
+// The function runs for real. Its forward to Netlify Forms is pointed back at this
+// server (URL below), which records it at GET /__test/forwarded (test server only).
+// That proves what the function would send, NOT Netlify Forms processing or delivery.
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import contactHandler from "../netlify/functions/contact.mjs";
 
 const ROOT = path.resolve("_site");
-const PORT = Number(process.env.PORT || 8080);
+const PORT = Number(process.env.PORT || 8181);
+
+process.env.URL ??= `http://localhost:${PORT}`;
+process.env.CONTACT_FORM_NAME ??= "local-test-form-name";
+let forwarded = [];
 
 const TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -76,6 +86,15 @@ async function headersFor(urlPath) {
   return headers;
 }
 
+// [[redirects]] with status = 404 and force = true (e.g. the hidden forms stub).
+async function isForced404(urlPath) {
+  const toml = await readFile("netlify.toml", "utf8");
+  return toml
+    .split("[[redirects]]")
+    .slice(1)
+    .some((block) => /status\s*=\s*404/.test(block) && /force\s*=\s*true/.test(block) && block.match(/from\s*=\s*"([^"]+)"/)?.[1] === urlPath);
+}
+
 async function isFile(file) {
   try {
     return (await stat(file)).isFile();
@@ -86,6 +105,39 @@ async function isFile(file) {
 
 createServer(async (req, res) => {
   const { pathname } = new URL(req.url, "http://localhost");
+
+  if (pathname === "/api/contact") {
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    const request = new Request(`http://localhost:${PORT}${req.url}`, {
+      method: req.method,
+      headers: req.headers,
+      body: ["GET", "HEAD"].includes(req.method) ? undefined : Buffer.concat(chunks),
+    });
+    const response = await contactHandler(request);
+    res.writeHead(response.status, Object.fromEntries(response.headers));
+    res.end(Buffer.from(await response.arrayBuffer()));
+    return;
+  }
+
+  if (pathname === "/__test/forwarded") {
+    res.writeHead(200, { "Content-Type": "application/json" }).end(JSON.stringify(forwarded));
+    if (req.method === "DELETE") forwarded = [];
+    return;
+  }
+
+  // Any other POST stands in for Netlify Forms: record the body, then serve the page.
+  if (req.method === "POST") {
+    let body = "";
+    for await (const chunk of req) body += chunk;
+    forwarded.push(Object.fromEntries(new URLSearchParams(body)));
+  }
+
+  if (await isForced404(pathname)) {
+    res.writeHead(404, { ...(await headersFor(pathname)), "Content-Type": TYPES[".html"] });
+    res.end(await readFile(path.join(ROOT, "404.html")));
+    return;
+  }
   const target = path.join(ROOT, decodeURIComponent(pathname));
   if (target !== ROOT && !target.startsWith(ROOT + path.sep)) {
     res.writeHead(400).end();

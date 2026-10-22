@@ -54,6 +54,17 @@ export default function (eleventyConfig) {
     });
   });
 
+  // The contact function forwards to a Netlify form whose name is a deploy secret
+  // (see src/pages/forms-stub.11ty.js). Never ship production without it.
+  eleventyConfig.on("eleventy.before", () => {
+    if (process.env.CONTEXT === "production" && !process.env.CONTACT_FORM_NAME) {
+      throw new Error("[forms] CONTACT_FORM_NAME must be set for production builds (Netlify env var, Builds + Functions scopes).");
+    }
+    if (process.env.CONTEXT && process.env.CONTEXT !== "production" && !process.env.CONTACT_FORM_NAME) {
+      console.warn("[forms] CONTACT_FORM_NAME is not set: the contact form will show its error page on this deploy.");
+    }
+  });
+
   // Raster icons for platforms that don't use the SVG favicon.
   eleventyConfig.on("eleventy.before", async ({ directories }) => {
     for (const [width, name] of [[180, "apple-touch-icon"], [32, "favicon-32"]]) {
@@ -67,9 +78,10 @@ export default function (eleventyConfig) {
     }
   });
 
-  // Safe JSON for <script type="application/ld+json">.
+  // Safe JSON for <script type="application/ld+json">: escape "<" so a value can
+  // never close the script element.
   eleventyConfig.addFilter("jsonLd", (value) =>
-    JSON.stringify(value).replace(/</g, "\u003c")
+    JSON.stringify(value).replace(/</g, "\\u003c")
   );
 
   eleventyConfig.addFilter("absoluteUrl", (urlPath, base) =>

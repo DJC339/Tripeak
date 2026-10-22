@@ -1,6 +1,8 @@
-// Primary and footer navigation. Only list destinations that exist.
+// Primary and footer navigation (order from the mock-up). The Contact button is
+// separate: it links to the homepage contact section (site.contactHref).
 export default [
   { title: "Home", url: "/" },
   { title: "About", url: "/about/" },
-  { title: "Services", url: "/#services" },
+  { title: "Portfolio", url: "/portfolio/" },
+  { title: "Services", url: "/services/" },
 ];

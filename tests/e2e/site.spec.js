@@ -1,7 +1,13 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const PAGES = ["/", "/about/", "/404.html"];
+const PAGES = ["/", "/about/", "/portfolio/", "/services/", "/thanks/", "/form-error/", "/form-unconfirmed/", "/404.html"];
+const NAV = [
+  ["Home", "/"],
+  ["About", "/about/"],
+  ["Portfolio", "/portfolio/"],
+  ["Services", "/services/"],
+];
 const WIDTHS = [320, 375, 768, 1024, 1440];
 
 // Adds test-only CSS through the CSSOM (the page's CSP rightly blocks <style> injection).
@@ -43,6 +49,8 @@ for (const width of WIDTHS) {
         // The footer email should never break mid-address.
         const email = await page.locator('footer a[href^="mailto"]').boundingBox();
         expect(email.height, "footer email wraps").toBeLessThanOrEqual(48);
+        const formLink = await page.getByRole("contentinfo").getByRole("link", { name: "Contact form" }).boundingBox();
+        expect(formLink.y, "footer contact links stack").toBeGreaterThanOrEqual(email.y + email.height - 1);
 
         const brokenImages = await page.$$eval("img", (imgs) =>
           imgs.filter((img) => !img.complete || img.naturalWidth === 0).map((img) => img.src)
@@ -125,7 +133,7 @@ test.describe("accessibility (axe, WCAG 2.2 A/AA rules)", () => {
 });
 
 test.describe("links", () => {
-  test("every internal link and anchor resolves; CTAs use the contact email", async ({ page, request }) => {
+  test("every internal link and anchor resolves; email links use the supplied address", async ({ page, request }) => {
     const seen = new Set();
     for (const path of PAGES) {
       await page.goto(path);
@@ -134,11 +142,11 @@ test.describe("links", () => {
         expect(href, `empty link on ${path}`).toMatch(/\S/);
         expect(href).not.toBe("#");
         if (href.startsWith("mailto:")) {
-          expect(href).toMatch(/^mailto:info@tripeakdigital\.ca(\?subject=[^&]+)?$/);
+          expect(href).toBe("mailto:info@tripeakdigital.ca");
           continue;
         }
         expect(href, `external or unexpected link ${href}`).toMatch(/^\/|^#/);
-        seen.add(new URL(href, `http://localhost:8080${path}`).href);
+        seen.add(new URL(href, page.url()).href);
       }
     }
     for (const url of seen) {
@@ -170,12 +178,24 @@ test.describe("keyboard and navigation", () => {
     await expect(page.locator("main")).toBeFocused();
   });
 
-  test("current page is marked in the primary navigation", async ({ page }) => {
+  test("header and footer list the four pages in order, with the current page marked", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/about/");
-    const nav = page.getByRole("navigation", { name: "Primary" });
-    await expect(nav.getByRole("link", { name: "About" })).toHaveAttribute("aria-current", "page");
-    await expect(nav.getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
+    for (const [, current] of NAV) {
+      await page.goto(current);
+      const primary = page.getByRole("navigation", { name: "Primary" });
+      const footer = page.getByRole("navigation", { name: "Explore" });
+      for (const nav of [primary, footer]) {
+        const links = await nav.getByRole("listitem").getByRole("link").evaluateAll((as) =>
+          as.map((a) => [a.textContent.trim(), a.getAttribute("href")])
+        );
+        expect(links).toEqual(NAV);
+      }
+      for (const [name, url] of NAV) {
+        const link = primary.getByRole("link", { name, exact: true });
+        if (url === current) await expect(link).toHaveAttribute("aria-current", "page");
+        else await expect(link).not.toHaveAttribute("aria-current");
+      }
+    }
   });
 
   test("desktop shows navigation without a toggle", async ({ page }) => {
@@ -221,14 +241,14 @@ test.describe("keyboard and navigation", () => {
     await expect(aboutLink).toBeHidden();
   });
 
-  test("choosing Services in the mobile menu closes it and jumps to the section", async ({ page }) => {
+  test("choosing Contact in the mobile menu closes it and jumps to the form", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 800 });
     await page.goto("/");
     await page.getByRole("button", { name: "Menu" }).click();
-    await page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Services" }).click();
-    await expect(page).toHaveURL(/#services$/);
+    await page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Contact" }).click();
+    await expect(page).toHaveURL(/\/#contact$/);
     await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute("aria-expanded", "false");
-    await expect(page.getByRole("heading", { name: "Our Core Capabilities" })).toBeInViewport();
+    await expect(page.getByRole("heading", { name: "Contact", exact: true })).toBeInViewport();
   });
 });
 
@@ -238,7 +258,7 @@ test.describe("without JavaScript", () => {
   test("navigation links remain visible and the toggle is not shown", async ({ page }) => {
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Primary" });
-    for (const name of ["Home", "About", "Services", "Contact"]) {
+    for (const name of ["Home", "About", "Portfolio", "Services", "Contact"]) {
       await expect(nav.getByRole("link", { name })).toBeVisible();
     }
     await expect(page.getByRole("button", { name: "Menu" })).toBeHidden();
@@ -312,4 +332,156 @@ test.describe("logos", () => {
       }
     });
   }
+});
+
+test.describe("calls to action", () => {
+  test("homepage CTAs point to the right destinations", async ({ page }) => {
+    await page.goto("/");
+    const expected = [
+      ["Schedule a Technical Discovery", "/#contact"],
+      ["View All Our Services", "/services/"],
+      ["View Our Portfolio", "/portfolio/"],
+    ];
+    for (const [name, href] of expected) {
+      await expect(page.getByRole("main").getByRole("link", { name, exact: true })).toHaveAttribute("href", href);
+    }
+    await expect(page.getByRole("banner").getByRole("link", { name: "Contact", exact: true })).toHaveAttribute("href", "/#contact");
+  });
+
+  test("header Contact works from another page", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/services/");
+    await page.getByRole("banner").getByRole("link", { name: "Contact", exact: true }).click();
+    await expect(page).toHaveURL(/\/#contact$/);
+    await expect(page.getByRole("heading", { name: "Contact", exact: true })).toBeInViewport();
+    await expect(page.getByRole("textbox", { name: "Name" })).toBeVisible();
+  });
+
+  test("placeholder pages are labelled as drafts; Home and About are not", async ({ page }) => {
+    for (const path of ["/portfolio/", "/services/"]) {
+      await page.goto(path);
+      await expect(page.getByText("Draft page — placeholder content")).toBeVisible();
+      expect(await page.getByText("Placeholder — content awaiting Keith").count()).toBeGreaterThan(0);
+    }
+    for (const path of ["/", "/about/"]) {
+      await page.goto(path);
+      await expect(page.getByText("Draft page — placeholder content")).toHaveCount(0);
+    }
+  });
+});
+
+test.describe("contact form", () => {
+  // The test server runs the real contact function; its forward to Netlify Forms
+  // is captured locally. None of this proves Netlify Forms processing or delivery.
+  const forwardedFor = async (request, email) =>
+    (await (await request.get("/__test/forwarded")).json()).filter((entry) => entry.email === email);
+
+  test("posts to the validating function, with labelled required fields, autocomplete and a hidden honeypot", async ({ page }) => {
+    await page.goto("/");
+    const form = page.locator("#contact form");
+    await expect(form).toHaveAttribute("method", "POST");
+    await expect(form).toHaveAttribute("action", "/api/contact");
+    // Not registered with Netlify directly, so it can't be used to skip validation.
+    await expect(form).not.toHaveAttribute("data-netlify");
+    await expect(form.locator('input[name="form-name"]')).toHaveCount(0);
+
+    const fields = [
+      ["Name", "name", "name"],
+      ["Email", "email", "email"],
+      ["Message", "message", null],
+    ];
+    for (const [label, name, autocomplete] of fields) {
+      const field = form.getByLabel(label, { exact: true });
+      await expect(field).toHaveAttribute("name", name);
+      await expect(field).toHaveAttribute("required", "");
+      if (autocomplete) await expect(field).toHaveAttribute("autocomplete", autocomplete);
+    }
+    await expect(form.getByLabel("Email", { exact: true })).toHaveAttribute("type", "email");
+
+    const honeypot = form.locator('input[name="bot-field"]');
+    await expect(honeypot).toBeHidden();
+    await expect(honeypot).toHaveAttribute("tabindex", "-1");
+
+    // The honeypot is not reachable by Tab: Message → Send Message.
+    await form.getByLabel("Message", { exact: true }).focus();
+    await page.keyboard.press("Tab");
+    await expect(form.getByRole("button", { name: "Send Message" })).toBeFocused();
+  });
+
+  test("browser validation blocks empty and invalid submissions", async ({ page }) => {
+    await page.goto("/");
+    const form = page.locator("#contact form");
+    await form.getByRole("button", { name: "Send Message" }).click();
+    await expect(page).toHaveURL(/\/$/);
+    expect(await form.evaluate((f) => f.checkValidity())).toBe(false);
+
+    await form.getByLabel("Name", { exact: true }).fill("Test Person");
+    await form.getByLabel("Email", { exact: true }).fill("not-an-email");
+    await form.getByLabel("Message", { exact: true }).fill("Hello there");
+    expect(await form.getByLabel("Email", { exact: true }).evaluate((el) => el.validity.typeMismatch)).toBe(true);
+    await form.getByRole("button", { name: "Send Message" }).click();
+    await expect(page).toHaveURL(/\/$/);
+  });
+
+  test("whitespace-only input passes the browser but is rejected by the server", async ({ page, request }) => {
+    const email = `spaces-${Date.now()}@example.org`;
+    await page.goto("/");
+    const form = page.locator("#contact form");
+    await form.getByLabel("Name", { exact: true }).fill("     ");
+    await form.getByLabel("Email", { exact: true }).fill(email);
+    await form.getByLabel("Message", { exact: true }).fill("          ");
+    await form.getByRole("button", { name: "Send Message" }).click();
+    await expect(page).toHaveURL(/\/form-error\/$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Your message wasn't sent");
+    expect(await forwardedFor(request, email)).toEqual([]);
+  });
+
+  test("a valid submission is forwarded with the server-side form name and shows the confirmation", async ({ page, request }) => {
+    const email = `valid-${Date.now()}@example.org`;
+    await page.goto("/");
+    const form = page.locator("#contact form");
+    await form.getByLabel("Name", { exact: true }).fill("  Test Person  ");
+    await form.getByLabel("Email", { exact: true }).fill(email);
+    await form.getByLabel("Message", { exact: true }).fill("Local test message.");
+    await form.getByRole("button", { name: "Send Message" }).click();
+    await expect(page).toHaveURL(/\/thanks\/$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Thank you");
+
+    expect(await forwardedFor(request, email)).toEqual([
+      { "form-name": "local-test-form-name", name: "Test Person", email, message: "Local test message." },
+    ]);
+  });
+
+  test("direct POSTs that skip the browser cannot submit blank or junk data", async ({ request }) => {
+    const email = `direct-${Date.now()}@example.org`;
+    const send = (form, headers) => request.post("/api/contact", { form, headers, maxRedirects: 0 });
+    const cases = {
+      "nothing at all": {},
+      "blank fields": { name: "", email: "", message: "" },
+      "whitespace fields": { name: "   ", email, message: "     " },
+      "missing message": { name: "Test Person", email },
+      "invalid email": { name: "Test Person", email: "nope", message: "Hello there" },
+      "spoofed form-name only": { "form-name": "contact" },
+    };
+    for (const [label, form] of Object.entries(cases)) {
+      const res = await send(form);
+      expect(res.status(), label).toBe(303);
+      expect(res.headers().location, label).toBe("/form-error/");
+      expect(res.headers()["cache-control"], label).toBe("no-store");
+    }
+
+    const crossSite = await send({ name: "Test Person", email, message: "Hello there" }, { Origin: "https://evil.test" });
+    expect(crossSite.headers().location).toBe("/form-error/");
+
+    const honeypot = await send({ name: "Test Person", email, message: "Hello there", "bot-field": "x" });
+    expect(honeypot.headers().location).toBe("/thanks/");
+
+    expect((await request.get("/api/contact", { maxRedirects: 0 })).status()).toBe(405);
+    expect(await forwardedFor(request, email)).toEqual([]);
+  });
+
+  test("the hidden Netlify form definition is not publicly readable", async ({ request }) => {
+    const res = await request.get("/__forms.html");
+    expect(res.status()).toBe(404);
+  });
 });

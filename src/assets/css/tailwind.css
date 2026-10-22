@@ -219,9 +219,28 @@
     );
   }
 
-  /* --- Placeholder content marker (About page) --------------------------- */
+  /* --- Placeholder content markers (content awaiting Keith) ------------- */
   .placeholder-note {
     @apply border-l-4 border-sand bg-white p-6 shadow-card;
+  }
+
+  /* Tag so it reads as a status label, distinct from card eyebrows. */
+  .placeholder-label {
+    @apply inline-block rounded-md bg-sand/45 px-2.5 py-0.5 text-sm font-bold tracking-[0.08em] text-navy uppercase;
+  }
+
+  /* --- Contact form ------------------------------------------------------ */
+  .form-label {
+    @apply block font-medium;
+  }
+
+  /* Border is navy at 70% on white (> 3:1 non-text contrast). */
+  .form-field {
+    @apply mt-2 block min-h-11 w-full rounded-md border border-navy/70 bg-white px-4 py-3 text-navy;
+  }
+
+  textarea.form-field {
+    @apply resize-y;
   }
 }
 

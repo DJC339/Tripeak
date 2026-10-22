@@ -1,0 +1,23 @@
+---
+# Utility page: Netlify Forms shows this after a successful contact-form
+# submission (the form's action). Not an information page; never indexed.
+layout: layouts/page.html
+permalink: /thanks/
+title: Message sent
+heading: Thank you
+description: Your message has been submitted.
+noindex: true
+eleventyExcludeFromCollections: true
+---
+{% from "components/ui.html" import buttonLink %}
+
+<section class="py-14 md:py-20" aria-label="Submission confirmation">
+  <div class="container-site *:max-w-3xl">
+    <p class="text-lead">Your message has been submitted through the contact form.</p>
+    <p class="mt-5">
+      If you need to reach us directly, email
+      <a class="font-medium text-teal underline underline-offset-4 hover:text-navy" href="{{ site.emailHref }}">{{ site.email }}</a>.
+    </p>
+    <div class="mt-10">{{ buttonLink("/", "Back to the homepage") }}</div>
+  </div>
+</section>

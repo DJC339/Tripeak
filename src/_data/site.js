@@ -26,10 +26,12 @@ const site = {
   email,
   location: { locality: "Edmonton", region: "Alberta", country: "CA" },
 
-  // Temporary calls to action. A booking tool may replace the discovery email later.
-  contactHref: `mailto:${email}`,
-  discoveryHref: `mailto:${email}?subject=${encodeURIComponent("Technical discovery request")}`,
-  servicesHref: `mailto:${email}?subject=${encodeURIComponent("Services enquiry")}`,
+  // Calls to action. The contact form lives on the homepage (#contact); the
+  // absolute path makes the link work from every page. The discovery CTA uses the
+  // form for now; a scheduling link can replace it if Keith supplies one.
+  contactHref: "/#contact",
+  discoveryHref: "/#contact",
+  emailHref: `mailto:${email}`,
 
   url,
   context,

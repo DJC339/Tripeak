@@ -1,0 +1,63 @@
+---
+layout: layouts/page.html
+permalink: /services/
+title: Services
+description: Microsoft Power Platform services from Tripeak Digital, including workflow automation, custom Power Apps and AI-assisted operations.
+intro: Secure, practical systems that replace fragmented processes and disconnected tools.
+# Remove `placeholder: true` once Keith's approved Services copy replaces the
+# placeholder blocks below. While set, the page is noindex and not in the sitemap.
+placeholder: true
+---
+{% from "components/ui.html" import buttonLink, capabilityCard, placeholderNote %}
+
+<section class="py-14 md:py-20" aria-labelledby="capabilities-title">
+  <div class="container-site">
+    <h2 id="capabilities-title" class="font-serif text-heading font-semibold">Core Capabilities</h2>
+    <ul class="mt-10 grid max-w-2xl gap-6 lg:max-w-none lg:grid-cols-3" role="list">
+      {% for item in capabilities %}
+        {{ capabilityCard(item.title, item.text) }}
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="pb-14 md:pb-20" aria-labelledby="offerings-title">
+  <div class="container-site *:max-w-3xl">
+    <h2 id="offerings-title" class="font-serif text-heading font-semibold">Power Platform &amp; Automation Offerings</h2>
+    <div class="mt-8">
+      {{ placeholderNote("Describe each service offering in Keith's words. Suggested structure:", [
+        "[Offering name and who it is for]",
+        "[What is delivered, e.g. Power Apps, Power Automate flows, Power BI reporting]",
+        "[Security and governance approach, as approved]"
+      ]) }}
+    </div>
+  </div>
+</section>
+
+<section class="pb-14 md:pb-20" aria-labelledby="process-title">
+  <div class="container-site *:max-w-3xl">
+    <h2 id="process-title" class="font-serif text-heading font-semibold">Our Process</h2>
+    <div class="mt-8">
+      {{ placeholderNote("Keith's working process, step by step. Suggested structure:", [
+        "[Step name and what happens]",
+        "[What the client provides and receives at each step]"
+      ]) }}
+    </div>
+  </div>
+</section>
+
+<section class="pb-16 md:pb-24" aria-labelledby="engagement-title">
+  <div class="container-site *:max-w-3xl">
+    <h2 id="engagement-title" class="font-serif text-heading font-semibold">Engagement Options</h2>
+    <div class="mt-8">
+      {{ placeholderNote("How clients can work with Tripeak Digital. To be confirmed by Keith:", [
+        "[Technical discovery: purpose, format and outputs]",
+        "[Staged projects: how work is phased and approved]",
+        "[Any other engagement models Keith offers]"
+      ]) }}
+    </div>
+    <div class="mt-10">
+      {{ buttonLink(site.discoveryHref, "Schedule a Technical Discovery", "tracking-wide") }}
+    </div>
+  </div>
+</section>

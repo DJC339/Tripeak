@@ -1,0 +1,27 @@
+---
+# Utility page: the contact function redirects here when it sent the submission to
+# Netlify Forms but couldn't confirm the result (timeout, network error, 5xx).
+# The message may or may not have been stored, so the visitor is asked not to
+# resubmit (which could create a duplicate) and to confirm by email instead.
+layout: layouts/page.html
+permalink: /form-unconfirmed/
+title: Message not confirmed
+heading: We couldn't confirm your message
+description: The contact form submission could not be confirmed.
+noindex: true
+eleventyExcludeFromCollections: true
+---
+{% from "components/ui.html" import buttonLink %}
+
+<section class="py-14 md:py-20" aria-label="Submission status unknown">
+  <div class="container-site *:max-w-3xl">
+    <p class="text-lead">Your message may have been received, but we couldn't confirm it.</p>
+    <p class="mt-5">
+      To avoid sending a duplicate, please don't submit the form again right away.
+      Instead, email
+      <a class="font-medium text-teal underline underline-offset-4 hover:text-navy" href="{{ site.emailHref }}">{{ site.email }}</a>
+      to check that it arrived.
+    </p>
+    <div class="mt-10">{{ buttonLink("/", "Back to the homepage") }}</div>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+---
+layout: layouts/base.html
+---
+{# Inner information pages (Services, Portfolio, About) and utility pages.
+   Front matter: title, heading (optional H1 override), intro (optional),
+   placeholder: true while the page holds unapproved placeholder content. #}
+<div class="on-dark bg-navy text-offwhite">
+  <div class="container-site py-14 md:py-20">
+    {% if placeholder %}
+      <p class="inline-block rounded-full border border-sand px-3 py-1 text-sm font-medium text-sand">Draft page — placeholder content</p>
+    {% endif %}
+    <h1 class="mt-4 font-serif text-display font-bold">{{ heading or title }}</h1>
+    {% if intro %}<p class="mt-5 max-w-3xl text-lead">{{ intro }}</p>{% endif %}
+  </div>
+</div>
+
+{{ content | safe }}

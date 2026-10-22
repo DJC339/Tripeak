@@ -1,0 +1,24 @@
+---
+# Utility page: the contact function (netlify/functions/contact.mjs) redirects
+# here when a submission is rejected or can't be delivered. The message is
+# deliberately generic; user input is never echoed back.
+layout: layouts/page.html
+permalink: /form-error/
+title: Message not sent
+heading: Your message wasn't sent
+description: The contact form submission could not be completed.
+noindex: true
+eleventyExcludeFromCollections: true
+---
+{% from "components/ui.html" import buttonLink %}
+
+<section class="py-14 md:py-20" aria-label="Submission problem">
+  <div class="container-site *:max-w-3xl">
+    <p class="text-lead">Please go back and check that you've entered your name, a valid email address and a message.</p>
+    <p class="mt-5">
+      If the problem continues, email
+      <a class="font-medium text-teal underline underline-offset-4 hover:text-navy" href="{{ site.emailHref }}">{{ site.email }}</a>.
+    </p>
+    <div class="mt-10">{{ buttonLink(site.contactHref, "Back to the contact form") }}</div>
+  </div>
+</section>

@@ -13,6 +13,19 @@
 [build.environment]
   NODE_VERSION = "24"
 
+# Contact form: netlify/functions/contact.mjs (/api/contact) validates submissions
+# and forwards them to a Netlify form named by the CONTACT_FORM_NAME env var. Set it
+# in the Netlify UI (not here: netlify.toml values aren't available to functions, and
+# this repo is public), for all deploy contexts, with Builds + Functions scopes.
+#
+# The hidden form definition (/__forms.html) is only for Netlify's deploy-time form
+# detection. Block public access so the secret form name can't be read.
+[[redirects]]
+  from = "/__forms.html"
+  to = "/404.html"
+  status = 404
+  force = true
+
 # --- Security headers (all responses) --------------------------------------
 # CSP allows only same-origin assets: no inline scripts/styles, no eval,
 # no third-party requests. Update it deliberately if a booking widget,

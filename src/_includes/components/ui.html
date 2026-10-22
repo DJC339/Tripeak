@@ -10,3 +10,53 @@
   <p class="mt-3">{{ text }}</p>
 </li>
 {% endmacro %}
+
+{# Portfolio project card (entry shape documented in src/_data/projects.js).
+   `detailed` adds challenge / solution / outcome for the Portfolio page.
+   `placeholder` labels the card as example content. #}
+{% macro projectCard(project, detailed=false, placeholder=false) %}
+<article class="card flex h-full flex-col">
+  {% if placeholder %}<p class="placeholder-label mb-3">Placeholder example</p>{% endif %}
+  {% if project.sector %}<p class="text-sm font-bold tracking-[0.15em] text-teal uppercase">{{ project.sector }}</p>{% endif %}
+  <h3 class="mt-1 font-serif text-card-title font-bold">{{ project.title }}</h3>
+  <p class="mt-3">{{ project.summary }}</p>
+  {% if detailed and (project.challenge or project.solution or project.outcome) %}
+    <dl class="mt-5 space-y-3">
+      {% for label, value in [["Challenge", project.challenge], ["Solution", project.solution], ["Outcome", project.outcome]] %}
+        {% if value %}<div><dt class="font-bold">{{ label }}</dt><dd class="mt-1">{{ value }}</dd></div>{% endif %}
+      {% endfor %}
+    </dl>
+  {% endif %}
+  {% if project.technologies and project.technologies.length %}
+    <ul class="mt-auto flex flex-wrap gap-2 pt-5" role="list" aria-label="Technologies">
+      {% for tech in project.technologies %}
+        <li class="rounded-full border border-teal px-3 py-1 text-sm text-teal">{{ tech }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</article>
+{% endmacro %}
+
+{# Example card shown while src/_data/projects.js is empty. #}
+{% set placeholderProject = {
+  sector: "[Sector or anonymized client type]",
+  title: "[Project title]",
+  summary: "[One- or two-sentence summary, approved by the client or anonymized.]",
+  challenge: "[The problem the client faced.]",
+  solution: "[What was built, e.g. which Power Platform tools.]",
+  outcome: "[Approved, verifiable outcome only.]",
+  technologies: ["[Technology]", "[Technology]"]
+} %}
+
+{# Clearly labelled block for content Keith will supply. #}
+{% macro placeholderNote(text, items=[]) %}
+<div class="placeholder-note">
+  <p class="placeholder-label">Placeholder — content awaiting Keith</p>
+  <p class="mt-3">{{ text }}</p>
+  {% if items.length %}
+    <ul class="mt-3 list-disc space-y-1 pl-6">
+      {% for item in items %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endmacro %}

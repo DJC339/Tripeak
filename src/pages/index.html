@@ -3,15 +3,9 @@ layout: layouts/base.html
 permalink: /
 organizationSchema: true
 # Homepage copy is from Keith's "Home Page Mock Up.pdf". Edit text directly below.
-capabilities:
-  - title: Workflow Automation
-    text: Unify your apps, tasks, and reporting into fast, seamless workflows.
-  - title: Custom Power Apps
-    text: Tailored applications designed around your team's specific requirements.
-  - title: AI-Assisted Operations
-    text: Guardrailed AI that removes busywork and supports human decisions.
+# Capability cards: src/_data/capabilities.js. Projects: src/_data/projects.js.
 ---
-{% from "components/ui.html" import buttonLink, capabilityCard %}
+{% from "components/ui.html" import buttonLink, capabilityCard, projectCard, placeholderNote, placeholderProject %}
 
 <section class="hero on-dark relative isolate overflow-hidden bg-navy text-offwhite" aria-labelledby="hero-title">
   {# Decorative background photo (empty alt). Not lazy-loaded: it is the above-the-fold image. #}
@@ -52,8 +46,35 @@ capabilities:
     </ul>
 
     <div class="mt-12 text-center md:mt-16">
-      {# Temporary: there is no Services page yet, so this opens an email enquiry. #}
-      {{ buttonLink(site.servicesHref, "Ask About Our Services", "min-w-[16.75rem] tracking-wide") }}
+      {{ buttonLink("/services/", "View All Our Services", "min-w-[16.75rem] tracking-wide") }}
     </div>
   </div>
 </section>
+
+{% set featured = projects | selectattr("featured") | list %}
+<section class="border-t border-navy/10 py-16 md:py-24" aria-labelledby="work-title">
+  <div class="container-site">
+    <div class="text-center">
+      <h2 id="work-title" class="font-serif text-heading font-semibold">Selected Work</h2>
+    </div>
+
+    {% if featured.length %}
+      <ul class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3" role="list">
+        {% for project in featured.slice(0, 3) %}
+          <li>{{ projectCard(project) }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
+        {{ placeholderNote("Up to three approved projects from the Portfolio will be featured here. Mark entries in src/_data/projects.js with featured: true.") }}
+        {{ projectCard(placeholderProject, placeholder=true) }}
+      </div>
+    {% endif %}
+
+    <div class="mt-12 text-center">
+      {{ buttonLink("/portfolio/", "View Our Portfolio", "min-w-[16.75rem] tracking-wide") }}
+    </div>
+  </div>
+</section>
+
+{% include "components/contact-section.html" %}

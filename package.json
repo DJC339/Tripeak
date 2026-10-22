@@ -15,7 +15,8 @@
     "test:build": "node --test \"tests/build/*.test.mjs\"",
     "test:e2e": "playwright test",
     "test": "npm run test:build && npm run test:e2e",
-    "test:install": "playwright install chromium"
+    "test:install": "playwright install chromium",
+    "verify:deploy": "node scripts/verify-deploy.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.7",
